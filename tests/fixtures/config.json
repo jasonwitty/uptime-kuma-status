@@ -1,0 +1,69 @@
+{
+ "config": {
+  "slug": "wittyoneoff",
+  "title": "WittyOneOff",
+  "description": null,
+  "icon": "/icon.svg",
+  "theme": "dark",
+  "published": true,
+  "showTags": false,
+  "footerText": null,
+  "showPoweredBy": true,
+  "googleAnalyticsId": null,
+  "showCertificateExpiry": false
+ },
+ "incident": null,
+ "publicGroupList": [
+  {
+   "id": 1,
+   "name": "Services",
+   "weight": 1,
+   "monitorList": [
+    {
+     "id": 2,
+     "name": "socktop.io",
+     "sendUrl": 0,
+     "type": "http"
+    },
+    {
+     "id": 1,
+     "name": "Nginx Proxy Manager",
+     "sendUrl": 0,
+     "type": "http"
+    },
+    {
+     "id": 8,
+     "name": "unami",
+     "sendUrl": 0,
+     "type": "http"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "Kuberneties",
+   "weight": 2,
+   "monitorList": [
+    {
+     "id": 9,
+     "name": "K3s - Control Node",
+     "sendUrl": 0,
+     "type": "ping"
+    },
+    {
+     "id": 10,
+     "name": "K3s Worker 1",
+     "sendUrl": 0,
+     "type": "ping"
+    },
+    {
+     "id": 11,
+     "name": "K3s Worker 2",
+     "sendUrl": 0,
+     "type": "ping"
+    }
+   ]
+  }
+ ],
+ "maintenanceList": []
+}
