@@ -24,9 +24,6 @@ Or from a checkout:
 cargo install --path .
 ```
 
-Needs Rust 1.85 or newer (edition 2024). Five dependencies, no async runtime:
-`ratatui`, `crossterm`, `ureq`, `serde`, `serde_json`.
-
 ## Usage
 
 ```
