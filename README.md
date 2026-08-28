@@ -5,9 +5,9 @@
 
 Render a public [Uptime Kuma](https://github.com/louislam/uptime-kuma) status page in your terminal.
 
-<img src="./docs/uptime-kuma-status.png">
+<img src="./docs/uptime_kuma_status_better.jpg">
 
-Built to sit in a tmux pane next to [socktop](https://github.com/jasonwitty/socktop) on a wall-mounted rack display with [socktop swipe](https://gt.wittyoneoff.com/jason/socktop-swipe), but its useful just from your terminal as well. May do some stuff with waybar and quickhsell in the future, stay tuned.
+Built to sit in a tmux pane next to [socktop](https://github.com/jasonwitty/socktop) on a wall-mounted rack display with [socktop swipe](https://gt.wittyoneoff.com/jason/socktop-swipe), but its useful just from your terminal as well. May do some stuff with waybar and quickshell in the future, stay tuned.
 
 Generally this project is meant to support the feature implemented, I am not looking to expand this out to a complete CLI or tui for all uptime kuma features. The current web interface is already good for doing that and that would be redundant. There are also others who have started on that project. 
 
