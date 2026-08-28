@@ -21,3 +21,34 @@ serde_json = "1"
 
 [profile.release]
 strip = true
+
+# Packaging. Both tools read the binary out of target/release, so CI must
+# `cargo build --release` before invoking either of them.
+
+[package.metadata.deb]
+maintainer = "Jason Witty <jasonpwitty+socktop@proton.me>"
+copyright = "2026, Jason Witty <jasonpwitty+socktop@proton.me>"
+license-file = ["LICENSE", "0"]
+section = "utils"
+priority = "optional"
+extended-description = """\
+A terminal dashboard for a public Uptime Kuma status page. Polls the two \
+unauthenticated JSON endpoints a public status page already serves and \
+renders monitor groups, heartbeat bars, 24h uptime and latency. Display \
+only: no authentication and no way to change anything on the server."""
+assets = [
+    ["target/release/uptime-kuma-status", "usr/bin/", "755"],
+    ["README.md", "usr/share/doc/uptime-kuma-status/README.md", "644"],
+]
+
+[package.metadata.generate-rpm]
+summary = "Render a public Uptime Kuma status page in the terminal"
+# The binary statically links its Rust deps; only libc/libgcc come from the
+# system. "builtin" reads those straight out of the ELF, which means this
+# works on a Debian-family runner with no rpm tooling installed.
+auto-req = "builtin"
+assets = [
+    { source = "target/release/uptime-kuma-status", dest = "/usr/bin/uptime-kuma-status", mode = "755" },
+    { source = "README.md", dest = "/usr/share/doc/uptime-kuma-status/README.md", mode = "644", doc = true },
+    { source = "LICENSE", dest = "/usr/share/doc/uptime-kuma-status/LICENSE", mode = "644", doc = true },
+]
