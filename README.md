@@ -12,7 +12,7 @@ Built to sit in a tmux pane next to [socktop](https://github.com/jasonwitty/sock
 Generally this project is meant to support the feature implemented, I am not looking to expand this out to a complete CLI or tui for all uptime kuma features. The current web interface is already good for doing that and that would be redundant. There are also others who have started on that project. 
 
 ## Install 
-(requires rust toolchain https://rustup.rs/)
+requires rust toolchain https://rustup.rs/
 
 ```sh
 cargo install uptime-kuma-status
