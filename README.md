@@ -72,6 +72,13 @@ cargo test                  # 52 unit tests, no network needed
 cargo clippy --all-targets
 ```
 
+## Test Status Page
+
+You are welcome to use my status page if you just want to give it a try
+
+```bash
+uptime-kuma-status https://status.wittyoneoff.com/status/wittyoneoff
+```
 
 ## Contributing
 
