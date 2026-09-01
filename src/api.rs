@@ -201,6 +201,24 @@ fn candidates(root: &str, path: &str, base: &str, slug: &str) -> Vec<StatusPage>
     out
 }
 
+/// What a URL can be judged on without touching the network, returning the
+/// title to show until the page announces its own.
+///
+/// Split out from [`StatusPage::resolve`] so that a malformed URL stays a
+/// usage error on stderr while the *network* half of resolving happens on the
+/// fetch thread. It must not run before the terminal is up: `q` would do
+/// nothing for as long as it took.
+pub fn precheck(url: &str) -> Result<String, String> {
+    if let Ok(page) = StatusPage::parse(url) {
+        return Ok(page.slug);
+    }
+    let (root, _) = split_root(trim_url(url)).ok_or(
+        "URL must look like https://host/status/<slug>, \
+         or the URL your setup serves the page from",
+    )?;
+    Ok(root.split_once("://").map_or(root, |(_, h)| h).to_string())
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ConfigResponse {
     pub config: Config,
@@ -453,6 +471,20 @@ mod tests {
     fn resolve_takes_the_offline_path_for_a_default_url() {
         let p = StatusPage::resolve("https://h/status/s/").unwrap();
         assert_eq!(p, StatusPage::parse("https://h/status/s").unwrap());
+    }
+
+    /// The offline half must stay offline: it runs before the terminal is up.
+    #[test]
+    fn precheck_names_a_title_without_the_network() {
+        assert_eq!(precheck("https://h/status/mine/").unwrap(), "mine");
+        assert_eq!(
+            precheck("https://status.kuma.pet/").unwrap(),
+            "status.kuma.pet"
+        );
+        assert_eq!(precheck("http://h:3001").unwrap(), "h:3001");
+        for u in ["ftp://h/x", "status.example.com", ""] {
+            assert!(precheck(u).is_err(), "should have rejected {u}");
+        }
     }
 
     /// Guards against schema drift: these fixtures are real responses from a

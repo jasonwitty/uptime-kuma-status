@@ -83,13 +83,17 @@ fn main() -> ExitCode {
 }
 
 fn run(args: args::Args) -> Result<(), String> {
-    let page = StatusPage::resolve(&args.url)?;
+    // Only what can be judged offline is judged here, so that a malformed URL
+    // is a usage error on stderr rather than a banner inside a TUI the user
+    // then has to quit. Resolving the slug may need a request of its own; that
+    // waits for the fetch thread.
+    let title = api::precheck(&args.url)?;
 
     let (tx, rx) = mpsc::channel();
     let refresh = Arc::new(AtomicBool::new(false));
-    spawn_fetcher(page.clone(), args.interval, tx, Arc::clone(&refresh));
+    spawn_fetcher(args.url.clone(), args.interval, tx, Arc::clone(&refresh));
 
-    let mut state = State::new(page.slug.clone());
+    let mut state = State::new(title);
 
     // Installs a panic hook that restores the terminal, so a crash cannot
     // leave the user in raw mode with no echo.
@@ -139,12 +143,23 @@ fn event_loop(
 /// The config endpoint is re-fetched each cycle rather than once at startup, so
 /// a monitor added to the status page shows up without a restart. It is a few
 /// kilobytes once a minute.
-fn spawn_fetcher(page: StatusPage, interval: u64, tx: Sender<Msg>, refresh: Arc<AtomicBool>) {
+///
+/// The URL is resolved here rather than by the caller because
+/// [`StatusPage::resolve`] can cost an HTTP request, and nothing that can
+/// block for ten seconds belongs in front of the terminal: the UI draws and
+/// answers the keyboard while this runs. A page that cannot be resolved yet is
+/// reported like any other fetch failure and tried again next cycle, so a host
+/// that is down at startup needs no restart either.
+fn spawn_fetcher(url: String, interval: u64, tx: Sender<Msg>, refresh: Arc<AtomicBool>) {
     thread::spawn(move || {
+        let mut page: Option<StatusPage> = None;
         loop {
-            let msg = match (api::fetch_config(&page), api::fetch_heartbeat(&page)) {
-                (Ok(cfg), Ok(hb)) => Msg::Data(Box::new(cfg), Box::new(hb)),
-                (Err(e), _) | (_, Err(e)) => Msg::Error(e),
+            let msg = match page {
+                Some(ref p) => fetch(p),
+                None => match StatusPage::resolve(&url) {
+                    Ok(p) => fetch(page.insert(p)),
+                    Err(e) => Msg::Error(e),
+                },
             };
             // The receiver is gone: the UI has quit, so should this thread.
             if tx.send(msg).is_err() {
@@ -153,6 +168,14 @@ fn spawn_fetcher(page: StatusPage, interval: u64, tx: Sender<Msg>, refresh: Arc<
             sleep_or_refresh(interval, &refresh);
         }
     });
+}
+
+/// One cycle of both endpoints, folded into a single message for the UI.
+fn fetch(page: &StatusPage) -> Msg {
+    match (api::fetch_config(page), api::fetch_heartbeat(page)) {
+        (Ok(cfg), Ok(hb)) => Msg::Data(Box::new(cfg), Box::new(hb)),
+        (Err(e), _) | (_, Err(e)) => Msg::Error(e),
+    }
 }
 
 /// Sleeps in short slices so that pressing `r` is felt immediately rather than
