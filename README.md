@@ -30,7 +30,8 @@ cargo install --path .
 uptime-kuma-status <STATUS_PAGE_URL> [OPTIONS]
 
 ARGS:
-    <STATUS_PAGE_URL>   e.g. https://status.example.com/status/myslug
+    <STATUS_PAGE_URL>   e.g. https://status.example.com/status/myslug, or
+                        whatever URL your setup serves the page from
 
 OPTIONS:
     --interval <secs>   refresh period, default 60 (minimum 5)
@@ -45,6 +46,17 @@ KEYS:
 
 The URL is the page you would open in a browser. A trailing slash, a query
 string, and a reverse-proxied sub-path all work.
+
+`/status/<slug>` is only Uptime Kuma's default path, so it is not required
+either. If the URL does not carry a slug - a page published at the site root
+via Uptime Kuma's *entry page* setting, or moved somewhere else by a reverse
+proxy - the slug is read from the `manifest` link in the page's own HTML:
+
+```sh
+uptime-kuma-status https://status.kuma.pet/       # same page, no slug in the URL
+```
+
+That costs one extra HTTP request at startup, and only for URLs that need it.
 
 ## Reading the display
 
