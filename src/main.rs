@@ -83,7 +83,7 @@ fn main() -> ExitCode {
 }
 
 fn run(args: args::Args) -> Result<(), String> {
-    let page = StatusPage::parse(&args.url)?;
+    let page = StatusPage::resolve(&args.url)?;
 
     let (tx, rx) = mpsc::channel();
     let refresh = Arc::new(AtomicBool::new(false));

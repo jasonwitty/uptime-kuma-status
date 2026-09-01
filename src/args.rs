@@ -7,7 +7,8 @@ USAGE:
     uptime-kuma-status <STATUS_PAGE_URL> [OPTIONS]
 
 ARGS:
-    <STATUS_PAGE_URL>   e.g. https://status.example.com/status/myslug
+    <STATUS_PAGE_URL>   e.g. https://status.example.com/status/myslug, or
+                        whatever URL your setup serves the page from
 
 OPTIONS:
     --interval <secs>   refresh period, default 60 (minimum 5)
